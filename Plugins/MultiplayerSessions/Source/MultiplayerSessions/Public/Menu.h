@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -24,6 +22,12 @@ protected:
 
 	virtual bool Initialize() override;
 	virtual void NativeDestruct() override;
+
+	/**
+	 *	Callback for custom delegates on the MultiplayerSessionSubsystem
+	 */
+	UFUNCTION()
+	void OnCreateSession(bool bWasSuccessful);
 
 private:
 

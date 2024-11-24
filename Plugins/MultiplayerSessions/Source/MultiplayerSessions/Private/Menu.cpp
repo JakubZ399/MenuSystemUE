@@ -1,11 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Menu.h"
-
 #include "MultiplayerSessionsSubsystem.h"
 #include "Components/Button.h"
 
+/**
+ * 
+ */
 void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch)
 {
 	NumPublicConnections = NumberOfPublicConnections;
@@ -32,6 +31,11 @@ void UMenu::MenuSetup(int32 NumberOfPublicConnections, FString TypeOfMatch)
 	{
 		MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
 	}
+
+	if (MultiplayerSessionsSubsystem)
+	{
+		MultiplayerSessionsSubsystem->MultiplayerOnCreateSessionComplete.AddDynamic(this, &ThisClass::OnCreateSession);
+	}
 }
 
 bool UMenu::Initialize()
@@ -57,16 +61,25 @@ void UMenu::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UMenu::HostButtonClicked()
+void UMenu::OnCreateSession(bool bWasSuccessful)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Host"));
-	if (MultiplayerSessionsSubsystem)
+	if (bWasSuccessful)
 	{
-		MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType);
-		if (GetWorld())
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("WORK"));
+
+		UWorld* World = GetWorld();
+		if (World)
 		{
 			GetWorld()->ServerTravel("/Game/Level/Lobby?listen");
 		}
+	}
+}
+
+void UMenu::HostButtonClicked()
+{
+	if (MultiplayerSessionsSubsystem)
+	{
+		MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType);
 	}
 }
 
